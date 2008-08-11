@@ -56,6 +56,10 @@ class RecursivelyCascadedTreeMixin < Mixin
   has_one :first_child, :class_name => 'RecursivelyCascadedTreeMixin', :foreign_key => :parent_id
 end
 
+class TreeMixinNullify < Mixin
+  acts_as_tree :foreign_key => "parent_id", :order => "id", :dependent => :nullify
+end
+
 class TreeTest < Test::Unit::TestCase
   
   def setup
@@ -83,6 +87,16 @@ class TreeTest < Test::Unit::TestCase
     assert_equal @root_child1.parent, @root1
     assert_equal @root_child1.parent, @root_child2.parent
     assert_nil @root1.parent
+  end
+
+  def test_nullify
+    root4 = TreeMixinNullify.create!
+    root4_child = TreeMixinNullify.create! :parent_id => root4.id
+    assert_equal 2, TreeMixinNullify.count
+    assert_equal root4.id, root4_child.parent_id
+    root4.destroy
+    assert_equal 1, TreeMixinNullify.count
+    assert_nil root4_child.reload.parent_id
   end
 
   def test_delete
