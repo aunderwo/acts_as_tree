@@ -1,2 +1,5 @@
 2008-08-18 - Sean Huber (shuber@huberry.com)
+	* Added is_root? instance method and tests
+
+2008-08-18 - Sean Huber (shuber@huberry.com)
 	* The foreign_key for "parent" can't be a reference to the current node or any of its children

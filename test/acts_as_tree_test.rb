@@ -1,3 +1,4 @@
+$:.reject! { |path| path.include? 'TextMate' }
 require 'test/unit'
 
 require 'rubygems'
@@ -176,6 +177,12 @@ class TreeTest < Test::Unit::TestCase
 		assert !@root1.save
 		assert @root1.errors.on(:parent_id)
 	end
+	
+	def test_is_root
+	  assert @root1.is_root?
+	  assert !@root_child1.is_root?
+	  assert !TreeMixin.new.is_root?
+  end
 end
 
 class TreeTestWithEagerLoading < Test::Unit::TestCase

@@ -74,6 +74,13 @@ module ActiveRecord
       end
 
       module InstanceMethods
+        # Returns all children (recursively) of the current node.
+        #
+        #   parent.all_children # => [child1, child1_child1, child1_child2, child2, child2_child1, child3]
+        def all_children
+          self_and_all_children - [self]
+        end
+        
         # Returns list of ancestors, starting from parent until root.
         #
         #   subchild1.ancestors # => [child1, root]
@@ -82,12 +89,13 @@ module ActiveRecord
           nodes << node = node.parent while node.parent
           nodes
         end
-
-        # Returns all children (recursively) of the current node.
+        
+        # Checks if the current node is a root
         #
-        #   parent.all_children # => [child1, child1_child1, child1_child2, child2, child2_child1, child3]
-        def all_children
-          self_and_all_children - [self]
+        #   parent.is_root? # => true
+        #   child.is_root? # => false
+        def is_root?
+          !new_record? && self.parent.nil?
         end
 
         # Returns the root node of the tree.
