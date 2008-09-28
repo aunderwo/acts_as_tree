@@ -1,1 +1,1 @@
-ActiveRecord::Base.send :include, ActiveRecord::Acts::Tree
+require "acts_as_tree"
