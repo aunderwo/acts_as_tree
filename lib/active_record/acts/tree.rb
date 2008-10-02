@@ -9,7 +9,7 @@ module ActiveRecord
       # association. This requires that you have a foreign key column, which by default is called +parent_id+.
       #
       #   class Category < ActiveRecord::Base
-      #     acts_as_tree :order => "name"
+      #     acts_as_tree :order => "name", :dependent => false
       #   end
       #
       #   Example:
@@ -43,8 +43,13 @@ module ActiveRecord
           configuration = { :foreign_key => "parent_id", :order => nil, :counter_cache => nil, :dependent => :destroy }
           configuration.update(options) if options.is_a?(Hash)
 
+        # Added for model Page
           belongs_to :parent, :class_name => name, :foreign_key => configuration[:foreign_key], :counter_cache => configuration[:counter_cache]
-          has_many :children, :class_name => name, :foreign_key => configuration[:foreign_key], :order => configuration[:order], :dependent => configuration[:dependent]
+          if configuration[:dependent].nil?
+            has_many :children, :class_name => name, :foreign_key => configuration[:foreign_key], :order => configuration[:order]
+          else
+            has_many :children, :class_name => name, :foreign_key => configuration[:foreign_key], :order => configuration[:order], :dependent => configuration[:dependent]
+          end
 
           class_eval <<-EOV
             include ActiveRecord::Acts::Tree::InstanceMethods
