@@ -1,2 +1,1 @@
-require 'active_record/acts/tree'
-ActiveRecord::Base.send :include, ActiveRecord::Acts::Tree
+require File.dirname(__FILE__) + "/rails/init"
