@@ -70,7 +70,6 @@ module ActiveRecord
                   end
                 end
               end
->>>>>>> shuber/master:lib/active_record/acts/tree.rb
           EOV
         end
       end
