@@ -56,11 +56,33 @@ module ActiveRecord
 
             named_scope :roots, :conditions => "#{configuration[:foreign_key]} IS NULL", :order => #{configuration[:order].nil? ? "nil" : %Q{"#{configuration[:order]}"}}
             named_scope :root, :conditions => "#{configuration[:foreign_key]} IS NULL", :order => #{configuration[:order].nil? ? "nil" : %Q{"#{configuration[:order]}"}}
+
+
+            validate :ensure_foreign_key_does_not_reference_self_or_all_children, :on => :update
+            
+            protected
+            
+              def ensure_foreign_key_does_not_reference_self_or_all_children
+                unless new_record? # old AR versions don't seem to support the :on option for the validate method (e.g. :on => :update)
+                  if self_and_all_children.collect(&:id).include?(self.#{configuration[:foreign_key]})
+                    self.errors.add('#{configuration[:foreign_key]}', "can't be a reference to the current node or any of its children")
+                    false
+                  end
+                end
+              end
+>>>>>>> shuber/master:lib/active_record/acts/tree.rb
           EOV
         end
       end
 
       module InstanceMethods
+        # Returns all children (recursively) of the current node.
+        #
+        #   parent.all_children # => [child1, child1_child1, child1_child2, child2, child2_child1, child3]
+        def all_children
+          self_and_all_children - [self]
+        end
+        
         # Returns list of ancestors, starting from parent until root.
         #
         #   subchild1.ancestors # => [child1, root]
@@ -68,6 +90,14 @@ module ActiveRecord
           node, nodes = self, []
           nodes << node = node.parent while node.parent
           nodes
+        end
+        
+        # Checks if the current node is a root
+        #
+        #   parent.is_root? # => true
+        #   child.is_root? # => false
+        def is_root?
+          !new_record? && self.parent.nil?
         end
 
         # Returns the root node of the tree.
@@ -82,6 +112,13 @@ module ActiveRecord
         #   subchild1.siblings # => [subchild2]
         def siblings
           self_and_siblings - [self]
+        end
+
+        # Returns all children (recursively) and a reference to the current node.
+        #
+        #   parent.self_and_all_children # => [parent, child1, child1_child1, child1_child2, child2, child2_child1, child3]
+        def self_and_all_children
+          self.children.inject([self]) { |array, child| array += child.self_and_all_children }.flatten
         end
 
         # Returns all siblings and a reference to the current node.

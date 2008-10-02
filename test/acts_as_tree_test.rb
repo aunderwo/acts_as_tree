@@ -1,9 +1,11 @@
+$:.reject! { |path| path.include? 'TextMate' }
 require 'test/unit'
 
 require 'rubygems'
 require 'active_record'
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
+require File.dirname(__FILE__) + '/../lib/active_record/acts/tree'
 require File.dirname(__FILE__) + '/../init'
 
 class Test::Unit::TestCase
@@ -160,7 +162,41 @@ class TreeTest < Test::Unit::TestCase
     assert_equal [@root_child1, @root_child2], @root_child2.self_and_siblings
     assert_equal [@root1, @root2, @root3], @root2.self_and_siblings
     assert_equal [@root1, @root2, @root3], @root3.self_and_siblings
-  end           
+  end
+
+	def test_all_children
+		assert_equal [@root_child1, @child1_child, @root_child2], @root1.all_children
+		assert_equal [@child1_child], @root_child1.all_children
+		assert_equal [], @child1_child.all_children
+	end
+	
+	def test_self_and_all_children
+		assert_equal [@root1, @root_child1, @child1_child, @root_child2], @root1.self_and_all_children
+		assert_equal [@child1_child], @child1_child.self_and_all_children
+	end
+
+	def test_should_not_reference_self_as_parent_id_on_update
+		@root1.parent_id = @root1.id
+		assert !@root1.save
+		assert @root1.errors.on(:parent_id)
+	end
+	
+	def test_should_not_reference_children_as_parent_id_on_update
+		@root1.parent_id = @root_child1.id
+		assert !@root1.save
+		assert @root1.errors.on(:parent_id)
+		
+		@root1.reload
+		@root1.parent_id = @child1_child.id
+		assert !@root1.save
+		assert @root1.errors.on(:parent_id)
+	end
+	
+	def test_is_root
+	  assert @root1.is_root?
+	  assert !@root_child1.is_root?
+	  assert !TreeMixin.new.is_root?
+  end
 end
 
 class TreeTestWithEagerLoading < Test::Unit::TestCase
