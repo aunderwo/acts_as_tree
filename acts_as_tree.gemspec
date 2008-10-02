@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'acts_as_tree'
-  s.version = '1.0.3'
+  s.version = '1.0.4'
   s.date = '2008-10-02'
   
   s.summary = "Allows ActiveRecord Models to be easily structured as a tree"
