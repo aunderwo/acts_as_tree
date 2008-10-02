@@ -1,14 +1,14 @@
 Gem::Specification.new do |s|
   s.name = 'acts_as_tree'
-  s.version = '1.0.1'
-  s.date = '2008-09-27'
+  s.version = '1.0.2'
+  s.date = '2008-10-02'
   
   s.summary = "Allows ActiveRecord Models to be easily structured as a tree"
   s.description = ""
   
   s.authors = ["RailsJedi", 'David Heinemeier Hansson']
   s.email = 'railsjedi@gmail.com'
-  s.homepage = 'http://github.com/jcnetdev/acts_as_tree'
+  s.homepage = 'http://github.com/aunderwo/acts_as_tree'
   
   s.has_rdoc = true
   s.rdoc_options = ["--main", "README"]
